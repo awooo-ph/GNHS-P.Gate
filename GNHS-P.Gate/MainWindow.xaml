@@ -4,8 +4,30 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal"
+        TextOptions.TextRenderingMode="Auto"
+        xmlns:views="clr-namespace:GNHSP.Gate.Views"
+        Background="{DynamicResource MaterialDesignDarkBackground}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        
+        MinWidth="555" MinHeight="471"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        ResizeMode="NoResize"
+        WindowStyle="ToolWindow"
+        SnapsToDevicePixels="True"
+        xmlns:cnv="clr-namespace:GNHSP.Gate.Converters"
+        Title="GNHS-P Gate Monitor" Height="350" Width="525">
+    <md:DialogHost Identifier="RootDialog" IsOpen="True">
+        <md:DialogHost.DialogContent>
+            <views:Login/>
+        </md:DialogHost.DialogContent>
     <Grid>
         
     </Grid>
+    </md:DialogHost>
 </Window>
