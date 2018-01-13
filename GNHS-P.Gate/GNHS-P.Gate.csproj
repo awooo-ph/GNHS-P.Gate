@@ -47,6 +47,9 @@
     <Reference Include="Microsoft.Threading.Tasks.Extensions.Desktop, Version=1.0.168.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Bcl.Async.1.0.168\lib\net40\Microsoft.Threading.Tasks.Extensions.Desktop.dll</HintPath>
     </Reference>
+    <Reference Include="RawInputProcessor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RawInputProcessor.1.0.0\lib\net40\RawInputProcessor.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Data.SQLite, Version=1.0.106.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=MSIL">
@@ -80,6 +83,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="MainViewModel.cs" />
+    <Compile Include="Keyboard.cs" />
+    <Compile Include="ViewModels\GateMonitor.cs" />
     <Compile Include="ViewModels\StudentEditorViewModel.cs" />
     <Compile Include="Views\AlertDialog.xaml.cs">
       <DependentUpon>AlertDialog.xaml</DependentUpon>

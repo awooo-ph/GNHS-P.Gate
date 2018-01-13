@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using GNHSP.Gate.Models;
@@ -15,8 +16,17 @@ namespace GNHSP.Gate
     {
         private MainViewModel()
         {
-           // ShowLogin();
+           Messenger.Default.AddListener<string>(Messages.Scan, id =>
+           {
+               var stud = Student.Cache.FirstOrDefault(x => x.Barcode.ToUpper() == id.ToUpper());
+               if (stud == null) return;
+               GateMonitor.Student = stud;
+           });
         }
+
+        private GateMonitor _gateMonitor;
+        public GateMonitor GateMonitor => _gateMonitor ?? (_gateMonitor = new GateMonitor());
+        
         private static MainViewModel _instance;
         public static MainViewModel Instance => _instance ?? (_instance = new MainViewModel());
         
@@ -38,6 +48,10 @@ namespace GNHSP.Gate
                     return;
                 _CurrentUser = value;
                 OnPropertyChanged(nameof(CurrentUser));
+                if(value==null)
+                    Keyboard.UnHook();
+                else
+                    Keyboard.Hook(App.Current.MainWindow);
             }
         }
 
@@ -162,5 +176,27 @@ namespace GNHSP.Gate
 
         private SnackbarMessageQueue _messageQueue;
         public SnackbarMessageQueue MessageQueue => _messageQueue ?? (_messageQueue = new SnackbarMessageQueue());
+        
+        public bool IsWaitingForScanner => Keyboard.IsWaitingForScanner;
+
+        private ICommand _registerCommand;
+        private bool _regListenerAdded;
+        public ICommand RegisterCommand => _registerCommand ?? (_registerCommand = new DelegateCommand(d =>
+        {
+            if (!_regListenerAdded)
+            {
+                _regListenerAdded = true;
+                Messenger.Default.AddListener(Messages.ScannerRegistered, () =>
+                {
+                    awooo.Context.Post(dd =>
+                    {
+                        OnPropertyChanged(nameof(IsWaitingForScanner));
+                    },null);
+                });
+            }
+            
+            Keyboard.IsWaitingForScanner = true;
+            OnPropertyChanged(nameof(IsWaitingForScanner));
+        }));
     }
 }

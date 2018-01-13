@@ -8,28 +8,11 @@ namespace GNHSP.Gate
     /// </summary>
     public partial class MainWindow : Window
     {
-        //public MainWindow()
-        //{
-        //    InitializeComponent();
-            
-        //    _logGenie = new Magic(Card, StudentLog, true);
-        //    _logGenie.Expanding += (sender, args) =>
-        //    {
-        //        StudentLog.Visibility = Visibility.Visible;
-        //        //Card.IsEnabled = false;
-        //        //StudentLog.IsEnabled = false;
-        //    };
-        //    _logGenie.Expanded += (sender, args) =>
-        //    {
-        //        //StudentLog.IsEnabled = true;
-        //    };
-        //    _logGenie.Collapsed += (sender, args) =>
-        //    {
-        //        StudentLog.Visibility = Visibility.Hidden;
-        //        //Card.IsEnabled = true;
-        //    };
-        //}
-
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
+        
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);

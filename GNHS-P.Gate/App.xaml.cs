@@ -19,5 +19,11 @@ namespace GNHSP.Gate
             awooo.IsRunning = true;
             awooo.Context = SynchronizationContext.Current;
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+            Keyboard.UnHook();
+        }
     }
 }
