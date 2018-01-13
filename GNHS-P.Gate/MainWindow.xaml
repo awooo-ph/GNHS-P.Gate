@@ -122,40 +122,61 @@
                 </Grid>
             </md:Card>
 
-                <md:Card UniformCornerRadius="4" Grid.Column="1"
+                    <md:Card UniformCornerRadius="4" Grid.Column="1"
                      MinWidth="174"
                      VerticalAlignment="Stretch"
                              Margin="0 20 20 20">
-                    <Grid>
-                        <Grid.Triggers>
-                            <EventTrigger RoutedEvent="Grid.Loaded">
-                                <EventTrigger.Actions>
-                                    <BeginStoryboard>
-                                        <Storyboard>
-                                            <DoubleAnimation To="0" Storyboard.TargetName="Barcode"
+                        <Grid>
+                            <Grid.Triggers>
+                                <EventTrigger RoutedEvent="Grid.Loaded">
+                                    <EventTrigger.Actions>
+                                        <BeginStoryboard>
+                                            <Storyboard>
+                                                <DoubleAnimation To="0" Storyboard.TargetName="Barcode"
                                                              Storyboard.TargetProperty="Opacity"
                                                              Duration="0:0:1"
                                                              AutoReverse="True"
                                                              RepeatBehavior="Forever"/>
-                                        </Storyboard>
-                                    </BeginStoryboard>
-                                </EventTrigger.Actions>
-                            </EventTrigger>
-                        </Grid.Triggers>
-                        
-                        
-                            
-                                <md:PackIcon Kind="BarcodeScan" Height="256" Width="256"
+                                            </Storyboard>
+                                        </BeginStoryboard>
+                                    </EventTrigger.Actions>
+                                </EventTrigger>
+                            </Grid.Triggers>
+
+                            <md:PackIcon Kind="BarcodeScan" Height="256" Width="256"
                                              VerticalAlignment="Center"
                                              HorizontalAlignment="Center"
                                              Visibility="{Binding GateMonitor.HasStudent,Converter={cnv:BooleanToVisibility Collapsed,Visible}}"
                                              x:Name="Barcode"/>
-                            
-                        </Grid>
-                </md:Card>
-            </Grid>
 
-            <Grid Background="#77777777"
+                            <StackPanel HorizontalAlignment="Center"
+                                        VerticalAlignment="Center"
+                                Visibility="{Binding GateMonitor.HasStudent,Converter={cnv:BooleanToVisibility}}">
+                                
+                                <TextBlock Text="WELCOME"
+                                           FontSize="74pt"
+                                           Margin="20"
+                                           TextAlignment="Center"/>
+                                <Viewbox Margin="74 20">
+                                    <StackPanel>
+                                <TextBlock Text="{Binding GateMonitor.Student.Fullname,Mode=OneWay}"
+                                           TextAlignment="Center"
+                                           FontSize="74pt"/>
+                                
+                                
+                                <TextBlock FontSize="74pt" TextAlignment="Center">
+                                    <Run Text="{Binding GateMonitor.Student.YearLevel,Mode=OneWay}" />
+                                    <Run Text="-"/>
+                                    <Run Text="{Binding GateMonitor.Student.Section,Mode=OneWay}"/>
+                                </TextBlock>
+                                    </StackPanel>
+                                </Viewbox>
+                            </StackPanel>
+                        </Grid>
+                    </md:Card>
+                </Grid>
+
+            <Grid Background="#77000000"
                   Visibility="{Binding StudentEditor.IsOpen,Converter={cnv:BooleanToVisibility},FallbackValue=Collapsed}">
                 <views:StudentEditor VerticalAlignment="Center"
                                      DataContext="{Binding StudentEditor}"
