@@ -13,21 +13,85 @@
         xmlns:views="clr-namespace:GNHSP.Gate.Views"
         Background="{DynamicResource MaterialDesignDarkBackground}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        
         MinWidth="555" MinHeight="471"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        ResizeMode="NoResize"
-        WindowStyle="ToolWindow"
         SnapsToDevicePixels="True"
         xmlns:cnv="clr-namespace:GNHSP.Gate.Converters"
-        Title="GNHS-P Gate Monitor" Height="350" Width="525">
-    <md:DialogHost Identifier="RootDialog" IsOpen="True">
-        <md:DialogHost.DialogContent>
-            <views:Login/>
-        </md:DialogHost.DialogContent>
-    <Grid>
-        
-    </Grid>
+        xmlns:gate="clr-namespace:GNHSP.Gate"
+        Title="GNHS-P Gate Monitor" Height="350" Width="525"
+        DataContext="{Binding Source={x:Static gate:MainViewModel.Instance}}">
+    <md:DialogHost Identifier="RootDialog" x:Name="DialogHost" Focusable="False">
+        <Grid>
+
+            <md:Card UniformCornerRadius="4" x:Name="Card"
+                     MinWidth="174"
+                     HorizontalAlignment="Left"
+                     Width="Auto"
+                     VerticalAlignment="Stretch"
+                             Margin="20">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" MinHeight="174"/>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <md:ColorZone Mode="PrimaryDark">
+                        <StackPanel Orientation="Horizontal" Margin="10">
+                            <md:PackIcon Kind="School" Height="32" Width="32"
+                                                 VerticalAlignment="Center"/>
+                            <TextBlock Text=" STUDENTS" Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+                                               VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </md:ColorZone>
+
+                    <DataGrid Grid.Row="1" IsReadOnly="True"
+                              AutoGenerateColumns="False"
+                              ClipboardCopyMode="None"
+                              ItemsSource="{Binding Students}"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              SelectionUnit="Cell"
+                              IsSynchronizedWithCurrentItem="True">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn>
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                                                VerticalAlignment="Stretch"
+                                                HorizontalAlignment="Stretch"
+                                                Padding="0"
+                                                Height="Auto"
+                                                Width="Auto"
+                                                Content="{md:PackIcon Pencil}"
+                                                Command="{Binding Source={x:Static gate:MainViewModel.Instance},
+                                                          Path=EditStudentCommand}"
+                                                CommandParameter="{Binding}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="NAME" Binding="{Binding Fullname}" />
+                            <DataGridTextColumn Header="YEAR LEVEL" Binding="{Binding YearLevel}" />
+                            <DataGridTextColumn Header="SECTION" Binding="{Binding Section}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <UniformGrid Grid.Row="2" Rows="1">
+                        <Button Content="ADD NEW" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding AddStudentCommand}"
+                                        Height="Auto" Padding="10 20"/>
+                        <Button Content="DELETE ALL" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding DeleteAllStudentsCommand}"
+                                        Height="Auto" Padding="10 20" />
+                    </UniformGrid>
+                </Grid>
+            </md:Card>
+
+            <Grid Background="#77777777"
+                  Visibility="{Binding StudentEditor.IsOpen,Converter={cnv:BooleanToVisibility},FallbackValue=Collapsed}">
+                <views:StudentEditor VerticalAlignment="Center"
+                                     DataContext="{Binding StudentEditor}"
+                                     HorizontalAlignment="Center" />
+            </Grid>
+        </Grid>
     </md:DialogHost>
 </Window>

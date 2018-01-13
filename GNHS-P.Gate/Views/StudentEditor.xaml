@@ -1,0 +1,122 @@
+﻿<UserControl x:Class="GNHSP.Gate.Views.StudentEditor"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GNHSP.Gate.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             Background="Transparent"
+             Grid.IsSharedSizeScope="True"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <materialDesign:Flipper IsFlipped="{Binding IsFlipped}">
+        <materialDesign:Flipper.FrontContent>
+            <materialDesign:Card UniformCornerRadius="4" Width="444" x:Name="Card">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" MinHeight="174" SharedSizeGroup="a"/>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <materialDesign:ColorZone Mode="Dark">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <materialDesign:PackIcon Kind="Pencil" Height="32" Width="32"
+                                                 VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Title}"
+                                           Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+                                           Margin="10 0 0 0"
+                                               VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <Button Margin="10" Grid.Column="1" Content="{materialDesign:PackIcon Close}"
+                                    Command="{Binding CloseCommand}"
+                                    Style="{StaticResource MaterialDesignToolButton}"/>
+                        </Grid>
+                    </materialDesign:ColorZone>
+                    <StackPanel Grid.Row="1" DataContext="{Binding Student}" Margin="10">
+                        <TextBox Text="{Binding Firstname,UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.IsFloating="True"
+                                         materialDesign:HintAssist.Hint="FIRST NAME"
+                                         Margin="10"/>
+                        <TextBox Text="{Binding Lastname,UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.IsFloating="True"
+                                         materialDesign:HintAssist.Hint="LAST NAME"
+                                         Margin="10" />
+                        <TextBox Text="{Binding YearLevel,UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.IsFloating="True"
+                                         materialDesign:HintAssist.Hint="YEAR LEVEL"
+                                         Margin="10" />
+                        <TextBox Text="{Binding Section,UpdateSourceTrigger=PropertyChanged}"
+                                         materialDesign:HintAssist.IsFloating="True"
+                                         materialDesign:HintAssist.Hint="SECTION"
+                                         Margin="10" />
+                    </StackPanel>
+                    <UniformGrid Grid.Row="2" Rows="1">
+                        <Button Content="VIEW LOG" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ToggleFlipCommand}"
+                                        Height="Auto" Padding="10 20" />
+                        <Button Content="DELETE" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding DeleteCommand}"
+                                        Height="Auto" Padding="10 20" />
+                        <Button Content="SAVE" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding Student.SaveCommand}"
+                                        Height="Auto" Padding="10 20"/>
+                    </UniformGrid>
+                </Grid>
+            </materialDesign:Card>
+        </materialDesign:Flipper.FrontContent>
+        <materialDesign:Flipper.BackContent>
+            <materialDesign:Card UniformCornerRadius="4" Width="444" Height="{Binding ElementName=Card,Path=ActualHeight}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*" MinHeight="174" SharedSizeGroup="a"/>
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <materialDesign:ColorZone Mode="Dark">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" Margin="10">
+                                <materialDesign:PackIcon Kind="CalendarClock" Height="32" Width="32"
+                                                         VerticalAlignment="Center" />
+                                <TextBlock Text=" STUDENT'S LOG"
+                                           Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+                                           VerticalAlignment="Center" />
+                            </StackPanel>
+                            <Button Margin="10" Grid.Column="1" Content="{materialDesign:PackIcon Close}"
+                                    Command="{Binding CloseCommand}"
+                                    Style="{StaticResource MaterialDesignToolButton}" />
+                        </Grid>
+                    </materialDesign:ColorZone>
+                    <ListView Grid.Row="1">
+                        
+                    </ListView>
+                    <UniformGrid Grid.Row="2" Rows="1">
+                        <Button Content="STUDENT INFO" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ToggleFlipCommand}"
+                                        Height="Auto" Padding="10 20" />
+                        <Button Content="DELETE" Style="{StaticResource MaterialDesignFlatButton}"
+                                        Height="Auto" Padding="10 20" 
+                                Visibility="Hidden"/>
+                        <Button Content="CLEAR LOG" Style="{StaticResource MaterialDesignFlatButton}"
+                                        Height="Auto" Padding="10 20"/>
+                    </UniformGrid>
+                </Grid>
+            </materialDesign:Card>
+        </materialDesign:Flipper.BackContent>
+    </materialDesign:Flipper>
+</UserControl>
+
+
+
+
+
+
+

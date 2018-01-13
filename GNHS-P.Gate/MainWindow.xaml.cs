@@ -1,16 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using GenieLib;
+using Visibility = System.Windows.Visibility;
 
 namespace GNHSP.Gate
 {
@@ -19,9 +12,54 @@ namespace GNHSP.Gate
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        //public MainWindow()
+        //{
+        //    InitializeComponent();
+            
+        //    _logGenie = new Magic(Card, StudentLog, true);
+        //    _logGenie.Expanding += (sender, args) =>
+        //    {
+        //        StudentLog.Visibility = Visibility.Visible;
+        //        //Card.IsEnabled = false;
+        //        //StudentLog.IsEnabled = false;
+        //    };
+        //    _logGenie.Expanded += (sender, args) =>
+        //    {
+        //        //StudentLog.IsEnabled = true;
+        //    };
+        //    _logGenie.Collapsed += (sender, args) =>
+        //    {
+        //        StudentLog.Visibility = Visibility.Hidden;
+        //        //Card.IsEnabled = true;
+        //    };
+        //}
+
+        protected override void OnActivated(EventArgs e)
         {
-            InitializeComponent();
+            base.OnActivated(e);
+            MainViewModel.Instance.ShowLogin(DialogHost);
         }
+
+        //private Magic _logGenie;
+        //private void HistoryButton_OnClick(object sender, RoutedEventArgs e)
+        //{
+        //    _logGenie.IsGenieOut = !_logGenie.IsGenieOut;
+        //}
+
+        //private async void EditButtonClicked(object sender, RoutedEventArgs e)
+        //{
+        //    if (_logGenie.IsGenieOut)
+        //    {
+        //        _logGenie.IsGenieOut = false;
+        //        while (StudentLog.Visibility == Visibility.Visible)
+        //        {
+        //            await TaskEx.Delay(10);
+        //        }
+        //        await TaskEx.Delay(400);
+        //    }
+            
+        //    _logGenie.Lamp =(Button) sender;
+        //    _logGenie.IsGenieOut = true;
+        //}
     }
 }

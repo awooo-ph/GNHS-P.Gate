@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 
 namespace GNHSP.Gate
@@ -12,5 +13,11 @@ namespace GNHSP.Gate
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+            awooo.IsRunning = true;
+            awooo.Context = SynchronizationContext.Current;
+        }
     }
 }
