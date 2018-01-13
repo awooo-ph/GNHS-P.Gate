@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Data;
@@ -90,7 +91,7 @@ namespace GNHSP.Gate
             {
                 await TaskEx.Delay(100);
             }
-            
+            _loginShown = false;
             ShowLogin(host);
         }
 
@@ -114,7 +115,7 @@ namespace GNHSP.Gate
             StudentEditor.Student = d;
             StudentEditor.IsOpen = true;
             StudentEditor.IsFlipped = false;
-        }, d=>Students.CurrentItem!=null));
+        }));
 
         private StudentEditorViewModel _StudentEditor = new StudentEditorViewModel();
 
@@ -138,5 +139,28 @@ namespace GNHSP.Gate
             StudentEditor.IsFlipped = false;
             StudentEditor.IsOpen = true;
         }));
+
+        private ICommand _deleteAllStudentsCommand;
+
+        public ICommand DeleteAllStudentsCommand =>
+            _deleteAllStudentsCommand ?? (_deleteAllStudentsCommand = new DelegateCommand(
+                d =>
+                {
+                    var list = Student.Cache.ToList();
+                    foreach (var student in list)
+                    {
+                        student.Delete();
+                    }
+                    MessageQueue.Enqueue("All students have been deleted.","UNDO",
+                        students =>
+                        {
+                            foreach (var student in students)
+                                student.Undelete();
+                        }
+                        ,list, true);
+                }));
+
+        private SnackbarMessageQueue _messageQueue;
+        public SnackbarMessageQueue MessageQueue => _messageQueue ?? (_messageQueue = new SnackbarMessageQueue());
     }
 }

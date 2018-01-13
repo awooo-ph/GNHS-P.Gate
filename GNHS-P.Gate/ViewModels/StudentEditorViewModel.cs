@@ -49,7 +49,8 @@ namespace GNHSP.Gate.ViewModels
         public ICommand DeleteCommand => _deleteCommand ?? (_deleteCommand = new DelegateCommand(d =>
         {
             IsOpen = false;
-            Student.Delete(false);           
+            MainViewModel.Instance.MessageQueue.Enqueue("Student deleted.", "UNDO", s => s.Undelete(), Student, true);
+            Student.Delete(false);                       
         },d=>Student?.CanDelete()??false));
 
         private ICommand _toggleFlipCommand;

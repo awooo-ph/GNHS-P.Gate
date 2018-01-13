@@ -38,6 +38,10 @@
                         </Grid>
                     </materialDesign:ColorZone>
                     <StackPanel Grid.Row="1" DataContext="{Binding Student}" Margin="10">
+                        <TextBox Text="{Binding Barcode,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}"
+                                 materialDesign:HintAssist.IsFloating="True"
+                                 materialDesign:HintAssist.Hint="BARCODE"
+                                 Margin="10" />
                         <TextBox Text="{Binding Firstname,UpdateSourceTrigger=PropertyChanged}"
                                          materialDesign:HintAssist.IsFloating="True"
                                          materialDesign:HintAssist.Hint="FIRST NAME"

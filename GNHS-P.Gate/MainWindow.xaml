@@ -21,7 +21,8 @@
         xmlns:gate="clr-namespace:GNHSP.Gate"
         Title="GNHS-P Gate Monitor" Height="350" Width="525"
         DataContext="{Binding Source={x:Static gate:MainViewModel.Instance}}">
-    <md:DialogHost Identifier="RootDialog" x:Name="DialogHost" Focusable="False">
+    <md:DialogHost Identifier="RootDialog" x:Name="DialogHost" Focusable="False"
+                   SnackbarMessageQueue="{Binding MessageQueue}">
         <Grid>
 
             <md:Card UniformCornerRadius="4" x:Name="Card"
@@ -92,6 +93,11 @@
                                      DataContext="{Binding StudentEditor}"
                                      HorizontalAlignment="Center" />
             </Grid>
+            
+            <md:Snackbar VerticalAlignment="Bottom"
+                         x:Name="Snackbar"
+                         MessageQueue="{Binding MessageQueue}"
+                         HorizontalAlignment="Center"/>
         </Grid>
     </md:DialogHost>
 </Window>
