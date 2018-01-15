@@ -17,13 +17,40 @@ namespace GNHSP.Gate.ViewModels
             get => _Student;
             set
             {
-                if(value == _Student)
-                    return;
                 _Student = value;
                 OnPropertyChanged(nameof(Student));
                 OnPropertyChanged(nameof(HasStudent));
             }
         }
+
+        private Access _Access;
+
+        public Access Access
+        {
+            get => _Access;
+            set
+            {
+                _Access = value;
+                OnPropertyChanged(nameof(Access));
+                OnPropertyChanged(nameof(Message));
+            }
+        }
+
+        private GatePass _Pass;
+
+        public GatePass Pass
+        {
+            get => _Pass;
+            set
+            {
+                _Pass = value;
+                OnPropertyChanged(nameof(Pass));
+                OnPropertyChanged(nameof(Message));
+            }
+        }
+        
+        public string Message => (Pass?.In ?? false) ? "GOODBYE": "WELCOME";
+        
 
         public bool HasStudent => Student != null;
 

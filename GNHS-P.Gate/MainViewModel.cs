@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,8 +22,52 @@ namespace GNHSP.Gate
                var stud = Student.Cache.FirstOrDefault(x => x.Barcode.ToUpper() == id.ToUpper());
                if (stud == null) return;
                GateMonitor.Student = stud;
+               var pass = GatePass.GetPreviousPass(stud.Id);
+               if (pass == null)
+               {
+                   pass = new GatePass(stud.Id);                  
+               }
+               else
+               {
+                   pass = new GatePass(stud.Id,!pass.In);
+               }
+               pass.Save();
+               GateMonitor.Pass = pass;
            });
+            
+            Messenger.Default.AddListener<User>(Messages.ModelDeleted,
+                usr =>
+                {
+                    MessageQueue.Enqueue("User deleted", "UNDO", u =>
+                    {
+                        u.Undelete();
+                    }, usr);
+                    CurrentUser = null;
+                });
         }
+
+        private bool _ShowLog;
+
+        public bool ShowLog
+        {
+            get => _ShowLog;
+            set
+            {
+                if(value == _ShowLog)
+                    return;
+                _ShowLog = value;
+                OnPropertyChanged(nameof(ShowLog));
+            }
+        }
+
+        private ICommand _ToggleShowLogCommand;
+
+        public ICommand ToggleShowLogCommand => _ToggleShowLogCommand ?? 
+                                                (_ToggleShowLogCommand = new DelegateCommand(
+                                                        d =>
+                                                        {
+                                                            ShowLog = !ShowLog;
+                                                        }));
 
         private GateMonitor _gateMonitor;
         public GateMonitor GateMonitor => _gateMonitor ?? (_gateMonitor = new GateMonitor());
@@ -56,16 +101,20 @@ namespace GNHSP.Gate
         }
 
         private bool _loginShown;
+        private DialogHost RootDialog;
         public async void ShowLogin(DialogHost host)
         {
+            if (RootDialog == null && host != null)
+                RootDialog = host;
+            if (RootDialog == null) return;
             if (CurrentUser != null) return;
             if (_loginShown) return;
             _loginShown = true;
             var login = new Views.Login();
-            host.DialogContent = login;
-            host.IsOpen = true;
-            
-            host.DialogClosing += (sender, args) =>
+            RootDialog.DialogContent = login;
+            RootDialog.IsOpen = true;
+
+            RootDialog.DialogClosing += (sender, args) =>
             {
                 if (!((bool) args.Parameter))
                     App.Current.Shutdown(0);
@@ -90,23 +139,24 @@ namespace GNHSP.Gate
                 }
             };
                 
-            while (host.IsOpen)
+            while (RootDialog.IsOpen)
             {
                 await TaskEx.Delay(100);
             }
-
+            
+            _loginShown = false;
             if (CurrentUser != null) return;
             
             var alert = new AlertDialog("Authentication Failed","The username and password you entered is invalid.");
-            host.DialogContent = alert;
-            host.IsOpen = true;
+            RootDialog.DialogContent = alert;
+            RootDialog.IsOpen = true;
 
-            while(host.IsOpen)
+            while(RootDialog.IsOpen)
             {
                 await TaskEx.Delay(100);
             }
-            _loginShown = false;
-            ShowLogin(host);
+            
+            ShowLogin(RootDialog);
         }
 
         private ListCollectionView _students;
@@ -129,7 +179,7 @@ namespace GNHSP.Gate
             StudentEditor.Student = d;
             StudentEditor.IsOpen = true;
             StudentEditor.IsFlipped = false;
-        }));
+        }, d => CurrentUser?.IsAdmin ?? false));
 
         private StudentEditorViewModel _StudentEditor = new StudentEditorViewModel();
 
@@ -152,7 +202,7 @@ namespace GNHSP.Gate
             StudentEditor.Student = new Student();
             StudentEditor.IsFlipped = false;
             StudentEditor.IsOpen = true;
-        }));
+        },d=>CurrentUser?.IsAdmin??false));
 
         private ICommand _deleteAllStudentsCommand;
 
@@ -172,7 +222,7 @@ namespace GNHSP.Gate
                                 student.Undelete();
                         }
                         ,list, true);
-                }));
+                }, d => CurrentUser?.IsAdmin ?? false));
 
         private SnackbarMessageQueue _messageQueue;
         public SnackbarMessageQueue MessageQueue => _messageQueue ?? (_messageQueue = new SnackbarMessageQueue());
@@ -197,6 +247,115 @@ namespace GNHSP.Gate
             
             Keyboard.IsWaitingForScanner = true;
             OnPropertyChanged(nameof(IsWaitingForScanner));
+        }));
+
+        private ListCollectionView _logs;
+
+        public ListCollectionView Logs
+        {
+            get
+            {
+                if (_logs != null) return _logs;
+                _logs = new ListCollectionView(GatePass.Cache);
+                _logs.CustomSort = new LogComparer();
+                return _logs;
+            }
+        }
+
+        class LogComparer : IComparer
+        {
+            public int Compare(object x, object y)
+            {
+                var log1 = x as GatePass;
+                var log2 = y as GatePass;
+                return log2.Time.CompareTo(log1.Time);
+            }
+        }
+
+        private ICommand _newUserCommand;
+
+        public ICommand NewUserCommand
+        {
+            get
+            {
+                if (_newUserCommand != null) return _newUserCommand;
+                var vs = CollectionViewSource.GetDefaultView(User.Cache);
+                _newUserCommand = new DelegateCommand(d =>
+                {
+                    var usr = new User() {Username = "NEW USER"};
+                    User.Cache.Add(usr);
+                    vs.MoveCurrentTo(usr);                    
+                }, d => User.Cache.All(x => x.Id > 0));
+
+                vs.CurrentChanged += (sender, args) =>
+                {
+                    var newUser = User.Cache.FirstOrDefault(x => x.Id == 0);
+                    if (newUser == null)
+                        return;
+                    var cur = vs.CurrentItem as User;
+                    if (newUser.Id != cur?.Id)
+                        User.Cache.Remove(newUser);
+                };
+                
+                return _newUserCommand;
+            }
+        }
+
+        private bool _ChangePasswordVisible;
+
+        public bool ChangePasswordVisible
+        {
+            get => _ChangePasswordVisible;
+            set
+            {
+                if(value == _ChangePasswordVisible)
+                    return;
+                _ChangePasswordVisible = value;
+                OnPropertyChanged(nameof(ChangePasswordVisible));
+            }
+        }
+
+        
+        private ICommand _ToggleChangePasswordCommand;
+
+        public ICommand ToggleChangePasswordCommand =>
+            _ToggleChangePasswordCommand ?? (_ToggleChangePasswordCommand = new DelegateCommand(
+                d =>
+                {
+                    ChangePasswordVisible = !ChangePasswordVisible;
+                }));
+
+        private bool _IsSettingsVisible;
+
+        public bool IsSettingsVisible
+        {
+            get => _IsSettingsVisible;
+            set
+            {
+                if(value == _IsSettingsVisible)
+                    return;
+                _IsSettingsVisible = value;
+                OnPropertyChanged(nameof(IsSettingsVisible));
+            }
+        }
+
+        private ICommand _CancelRegisterCommand;
+
+        public ICommand CancelRegisterCommand =>
+            _CancelRegisterCommand ?? (_CancelRegisterCommand = new DelegateCommand(
+                d =>
+                {
+                    Keyboard.IsWaitingForScanner = false;
+                    OnPropertyChanged(nameof(IsWaitingForScanner));
+                }));
+
+        private ICommand _logoutCommand;
+
+        public ICommand LogoutCommand => _logoutCommand ?? (_logoutCommand = new DelegateCommand(d =>
+        {
+            CurrentUser = null;
+            IsSettingsVisible = false;
+            ShowLogin(null);
         }));
     }
 }

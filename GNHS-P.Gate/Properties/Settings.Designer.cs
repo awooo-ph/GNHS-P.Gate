@@ -34,5 +34,41 @@ namespace GNHSP.Gate.Properties {
                 this["ScannerId"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ScannerDescription {
+            get {
+                return ((string)(this["ScannerDescription"]));
+            }
+            set {
+                this["ScannerDescription"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ScannerType {
+            get {
+                return ((string)(this["ScannerType"]));
+            }
+            set {
+                this["ScannerType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ScannerName {
+            get {
+                return ((string)(this["ScannerName"]));
+            }
+            set {
+                this["ScannerName"] = value;
+            }
+        }
     }
 }

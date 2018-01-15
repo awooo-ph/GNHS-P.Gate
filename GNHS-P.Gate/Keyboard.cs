@@ -49,6 +49,9 @@ namespace GNHSP.Gate
             if (IsWaitingForScanner)
             {
                 Settings.Default.ScannerId = GetScannerId(e.Device);
+                Settings.Default.ScannerDescription = e.Device.Description;
+                Settings.Default.ScannerType = e.Device.Type.ToString();
+                Settings.Default.ScannerName = e.Device.Name;
                 Settings.Default.Save();
                 
                 IsWaitingForScanner = false;
@@ -62,12 +65,15 @@ namespace GNHSP.Gate
                 if (e.KeyPressState != KeyPressState.Down) return;
                 if (e.Key != Key.Enter)
                 {
-                    _input.Append((char)e.VirtualKey);
+                    if((e.Key>=Key.A && e.Key <= Key.Z)||(e.Key>=Key.D0 && e.Key<= Key.D9))
+                    {
+                        _input.Append((char) e.VirtualKey);
+                    }
                 }
                 else
                 {
                     if (_input.Length == 0) return;
-                    e.Handled = true;
+                    //e.Handled = true;
                     Messenger.Default.Broadcast(Messages.Scan, _input.ToString());
                     _input.Clear();
                 }
@@ -97,6 +103,7 @@ namespace GNHSP.Gate
             //    UnhookWindowsHookEx(hookPtr);
             //    hookPtr = IntPtr.Zero;
             //}
+            if (_rawInput == null) return;
             _rawInput.KeyPressed -= RawInputOnKeyPressed;
             _rawInput.Dispose();
         }

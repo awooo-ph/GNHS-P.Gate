@@ -1,0 +1,96 @@
+﻿<UserControl x:Class="GNHSP.Gate.Views.Settings"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:GNHSP.Gate.Views"
+             mc:Ignorable="d" 
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:converters="clr-namespace:GNHSP.Gate.Converters"
+             xmlns:properties="clr-namespace:GNHSP.Gate.Properties"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Horizontal"
+                                Margin="20">
+            <ToggleButton Style="{StaticResource MaterialDesignActionDarkToggleButton}"
+                                      IsChecked="{Binding IsSettingsVisible,Converter={converters:Inverter}}"
+                                      Content="{md:PackIcon ChevronRight}"
+                                      md:ToggleButtonAssist.OnContent="{md:PackIcon Settings}"/>
+            <TextBlock Text="ADMIN" Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+                                   Foreground="{StaticResource PrimaryHueDarkBrush}"
+                                   Margin="10 0 0 0"
+                                   VerticalAlignment="Center"/>
+        </StackPanel>
+        <Rectangle Fill="{StaticResource PrimaryHueDarkBrush}" Height="2"
+                               VerticalAlignment="Bottom"/>
+        <ScrollViewer VerticalScrollBarVisibility="Auto"
+                              Margin="0 20 0 0"
+                              Grid.Row="1">
+            <StackPanel Margin="20 0">
+                <local:ChangePassword Visibility="{Binding ChangePasswordVisible,Converter={converters:BooleanToVisibility}}" />
+                <Button Content="CHANGE PASSWORD" Command="{Binding ToggleChangePasswordCommand}"
+                        Visibility="{Binding ChangePasswordVisible,Converter={converters:BooleanToVisibility Collapsed,Visible}}"/>
+                <Button Content="LOGOUT" Command="{Binding LogoutCommand}" 
+                        Margin="0 10"/>
+
+                <StackPanel Orientation="Horizontal"
+                            Margin="0 40 0 0">
+                    <md:PackIcon Kind="BarcodeScan" Height="24" Width="24" 
+                                 VerticalAlignment="Center"/>
+                    <TextBlock Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+                               Text=" SCANNER"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+                
+                    
+                
+                <StackPanel Margin="0 10"
+                            Visibility="{Binding IsWaitingForScanner, Converter={converters:BooleanToVisibility Collapsed,Visible}}">
+                    <TextBlock>
+                        <Run Text="ID: "/>
+                        <Run Text="{Binding Source={x:Static properties:Settings.Default},Path=ScannerId}"
+                             FontWeight="Bold" />
+                    </TextBlock>
+                    <TextBlock>
+                        <Run Text="TYPE: " />
+                        <Run Text="{Binding Source={x:Static properties:Settings.Default},Path=ScannerDescription}"
+                             FontWeight="Bold" />
+                    </TextBlock>
+                </StackPanel>
+
+                <Grid Visibility="{Binding CurrentUser.IsAdmin,Converter={converters:BooleanToVisibility}}">
+                <Button Content="REGISTER SCANNER"
+                                Command="{Binding RegisterCommand}"
+                                Visibility="{Binding IsWaitingForScanner, Converter={converters:BooleanToVisibility Collapsed,Visible}}"/>
+                </Grid>
+                
+                <GroupBox Header="WAITING FOR SCANNER..."
+                            Visibility="{Binding IsWaitingForScanner, Converter={converters:BooleanToVisibility}}" >
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                    <ProgressBar Style="{StaticResource MaterialDesignLinearProgressBar}"
+                                 Margin="10"
+                                 Height="7"
+                                         IsIndeterminate="True"/>
+                    <Button Content="CANCEL"
+                            Grid.Column="1"
+                            Margin="10"
+                            Command="{Binding CancelRegisterCommand}" />
+                    </Grid>
+                </GroupBox>
+                
+
+
+                <local:Users Margin="0 40 0 0" Visibility="{Binding CurrentUser.IsAdmin,Converter={converters:BooleanToVisibility}}"/>
+                
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
