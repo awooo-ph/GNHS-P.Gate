@@ -8,6 +8,10 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:GNHSP.Gate.Converters"
              xmlns:properties="clr-namespace:GNHSP.Gate.Properties"
+             xmlns:global="clr-namespace:;assembly=System.GNHS-P.Gate.Data"
+             xmlns:properties1="clr-namespace:System.Data.Properties;assembly=System.GNHS-P.Gate.Data"
+             xmlns:viewModels="clr-namespace:GNHSP.Gate.ViewModels;assembly=System.GNHS-P.Gate.Data"
+             MaxWidth="555"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
         <Grid.RowDefinitions>
@@ -20,7 +24,7 @@
                                       IsChecked="{Binding IsSettingsVisible,Converter={converters:Inverter}}"
                                       Content="{md:PackIcon ChevronRight}"
                                       md:ToggleButtonAssist.OnContent="{md:PackIcon Settings}"/>
-            <TextBlock Text="ADMIN" Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+            <TextBlock Text="SETTINGS" Style="{StaticResource MaterialDesignHeadlineTextBlock}"
                                    Foreground="{StaticResource PrimaryHueDarkBrush}"
                                    Margin="10 0 0 0"
                                    VerticalAlignment="Center"/>
@@ -85,10 +89,90 @@
                             Command="{Binding CancelRegisterCommand}" />
                     </Grid>
                 </GroupBox>
-                
 
+              <StackPanel Orientation="Horizontal"
+                          Margin="0 40 0 0">
+                <md:PackIcon Kind="BarcodeScan" Height="24" Width="24"
+                             VerticalAlignment="Center" />
+                <TextBlock Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+                           Text=" SMS OPTIONS"
+                           VerticalAlignment="Center" />
+              </StackPanel>
+        <Grid Margin="0 10">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <ComboBox ItemsSource="{Binding Source={x:Static viewModels:SMS.Instance},Path=Ports}"
+                    SelectedValue="{Binding Source={x:Static properties1:SmsSettings.Default},Path=Port}"
+                    SelectedValuePath="Port" />
+          <Button Content="REFRESH"
+                  Grid.Column="1"
+                  Margin="10 0 0 0"
+                  Command="{Binding Source={x:Static viewModels:SMS.Instance},Path=RefreshPortsCommand}"/>
+        </Grid>
+              <TextBox Text="{Binding Source={x:Static properties:Settings.Default},Path=EntranceMessage}"
+                       md:HintAssist.Hint="ENTRANCE MESSAGE TEMPLATE"
+                       Margin="0 10"
+                       AcceptsReturn="True"
+                       MaxHeight="147"
+                       md:HintAssist.IsFloating="True"/>
+              <TextBox Text="{Binding Source={x:Static properties:Settings.Default},Path=ExitMessage}"
+                       Margin="0 10"
+                       AcceptsReturn="True"
+                       MaxHeight="147"
+                       md:HintAssist.Hint="EXIT MESSAGE TEMPLATE"
+                       md:HintAssist.IsFloating="True" />
+        <GroupBox Header="MESSAGE TEMPLATE VARIABLES"
+                  Margin="0 10">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition />
+          </Grid.RowDefinitions>
+          <TextBlock Text="[NAME]    " FontWeight="Bold"/>
+          <TextBlock Text="The name of the student." Grid.Column="1"
+                     Grid.Row="0"/>
+          <TextBlock Text="[TIME]    " FontWeight="Bold" 
+                     Grid.Row="1" Grid.Column="0"/>
+          <TextBlock Text="The time the student enters or leaves the school campus" Grid.Column="1"
+                     TextWrapping="Wrap"
+                     Grid.Row="1" />
+        </Grid>
+        </GroupBox>
+        <GroupBox Header="ATTENDANCE NOTIFICATION"
+                  Margin="0 10">
+          <StackPanel Orientation="Vertical">
+            <CheckBox Content="Notify parent's when their child is absent."
+                      IsChecked="{Binding Source={x:Static properties:Settings.Default},Path=NotifyAbsent}"/>
+            <Grid Margin="0 10">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <TextBox Text="{Binding Source={x:Static properties:Settings.Default},Path=AbsentTime}" md:HintAssist.Hint="CUT-OFF TIME"
+                       TextAlignment="Center"
+                       Margin="0 0 10 0"/>
+              <TextBlock Text="The time students are considered absent."
+                         VerticalAlignment="Center"
+                         TextWrapping="Wrap"
+                         Grid.Column="1"/>
+            </Grid>
+            <TextBox Text="{Binding Source={x:Static properties:Settings.Default},Path=AbsentMessage}"
+                     md:HintAssist.Hint="MESSAGE TO SEND WHEN ABSENT"
+                     md:HintAssist.IsFloating="True"
+                     AcceptsReturn="True"
+                     MaxHeight="147"
+                     ToolTip="Uses the same variables as above."
+                     Margin="0 10"/>
+          </StackPanel>
+        </GroupBox>
 
-                <local:Users Margin="0 40 0 0" Visibility="{Binding CurrentUser.IsAdmin,Converter={converters:BooleanToVisibility}}"/>
+        <local:Users Margin="0 47" Visibility="{Binding CurrentUser.IsAdmin,Converter={converters:BooleanToVisibility}}"/>
                 
             </StackPanel>
         </ScrollViewer>

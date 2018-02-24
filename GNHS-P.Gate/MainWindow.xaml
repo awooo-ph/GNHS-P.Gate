@@ -20,9 +20,11 @@
         xmlns:cnv="clr-namespace:GNHSP.Gate.Converters"
         xmlns:gate="clr-namespace:GNHSP.Gate"
         xmlns:properties="clr-namespace:GNHSP.Gate.Properties"
+        xmlns:models="clr-namespace:System.Data.Models;assembly=System.GNHS-P.Gate.Data"
         Title="GNHS-P Gate Monitor" Height="350" Width="525"
         DataContext="{Binding Source={x:Static gate:MainViewModel.Instance}}">
     <md:DialogHost Identifier="RootDialog" x:Name="DialogHost" Focusable="False"
+                   x:FieldModifier="internal"
                    SnackbarMessageQueue="{Binding ElementName=Snackbar,Path=MessageQueue}">
         <md:DrawerHost IsRightDrawerOpen="{Binding IsSettingsVisible}">
             <md:DrawerHost.RightDrawerContent>
@@ -37,59 +39,64 @@
                 </ListBox>
             
             <ToggleButton Style="{StaticResource MaterialDesignActionDarkToggleButton}"
-                          IsChecked="{Binding ElementName=ToggleStudents,Path=IsChecked}"
+                          IsChecked="{Binding ShowStudents}"
                           VerticalAlignment="Top"
                           HorizontalAlignment="Left"
                           md:ToggleButtonAssist.OnContent="{md:PackIcon School}"
-                          Visibility="{Binding ElementName=ToggleStudents,Path=IsChecked,Mode=OneWay,Converter={cnv:BooleanToVisibility Collapsed,Visible}}"
+                          Visibility="{Binding ShowStudents,Mode=OneWay,Converter={cnv:BooleanToVisibility Collapsed,Visible}}"
                           Content="{md:PackIcon School}" />
                 <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                   
-                
-                    <md:Flipper IsFlipped="{Binding ShowLog}"
+
+          <md:Transitioner SelectedIndex="{Binding InfoIndex}"
                                 Grid.Column="0"
-                                Visibility="{Binding ElementName=ToggleStudents,Converter={cnv:BooleanToVisibility},Path=IsChecked}"
+                                Visibility="{Binding ShowStudents,Converter={cnv:BooleanToVisibility}}"
                                 Margin="40 40 0 40"
                                 VerticalAlignment="Stretch">
-                        <md:Flipper.FrontContent>
-                            <md:Card UniformCornerRadius="4" x:Name="Card"
+            <md:TransitionerSlide>
+              <md:TransitionerSlide.ForwardWipe>
+                <md:FadeWipe/>
+              </md:TransitionerSlide.ForwardWipe>
+              <md:TransitionerSlide.BackwardWipe>
+                <md:FadeWipe />
+              </md:TransitionerSlide.BackwardWipe>
+              <Border Padding="7" x:Name="Card">
+              <md:Card UniformCornerRadius="4" 
                                      MinWidth="174"
                                      HorizontalAlignment="Left"
                                      Width="Auto"
                                      VerticalAlignment="Stretch">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*" MinHeight="174"/>
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <md:ColorZone Mode="PrimaryDark">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*"/>
-                                                <ColumnDefinition Width="Auto"/>
-                                            </Grid.ColumnDefinitions>
-                                        <StackPanel Orientation="Horizontal" Margin="10">
-                                            <md:PackIcon Kind="School" Height="32" Width="32"
+                <Grid>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" MinHeight="174"/>
+                    <RowDefinition Height="Auto" />
+                  </Grid.RowDefinitions>
+                  <md:ColorZone Mode="PrimaryDark">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                      </Grid.ColumnDefinitions>
+                      <StackPanel Orientation="Horizontal" Margin="10">
+                        <md:PackIcon Kind="School" Height="32" Width="32"
                                                  VerticalAlignment="Center"/>
-                                            <TextBlock Text=" STUDENTS" Style="{StaticResource MaterialDesignHeadlineTextBlock}"
+                        <TextBlock Text=" STUDENTS" Style="{StaticResource MaterialDesignHeadlineTextBlock}"
                                                VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                            <ToggleButton Grid.Column="1"
-                                                          x:Name="ToggleStudents"
+                      </StackPanel>
+                      <ToggleButton Grid.Column="1"
                                                           Margin="10"
-                                                          IsChecked="True"
+                                                          IsChecked="{Binding ShowStudents}"
                                                           Style="{StaticResource MaterialDesignActionDarkToggleButton}"
                                                           md:ToggleButtonAssist.OnContent="{md:PackIcon ChevronLeft}"
                                                           Content="{md:PackIcon ChevronRight}" />
-                                        </Grid>
-                                    </md:ColorZone>
+                    </Grid>
+                  </md:ColorZone>
 
-                                    <DataGrid Grid.Row="1" IsReadOnly="True"
+                  <DataGrid Grid.Row="1" IsReadOnly="True"
                               AutoGenerateColumns="False"
                               ClipboardCopyMode="None"
                               ItemsSource="{Binding Students}"
@@ -97,11 +104,11 @@
                               HeadersVisibility="Column"
                               SelectionUnit="Cell"
                               IsSynchronizedWithCurrentItem="True">
-                                        <DataGrid.Columns>
-                                            <DataGridTemplateColumn>
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Button Style="{StaticResource MaterialDesignFlatButton}"
+                    <DataGrid.Columns>
+                      <DataGridTemplateColumn>
+                        <DataGridTemplateColumn.CellTemplate>
+                          <DataTemplate>
+                            <Button Style="{StaticResource MaterialDesignFlatButton}"
                                                 VerticalAlignment="Stretch"
                                                 HorizontalAlignment="Stretch"
                                                 Padding="0"
@@ -111,65 +118,99 @@
                                                 Command="{Binding Source={x:Static gate:MainViewModel.Instance},
                                                           Path=EditStudentCommand}"
                                                 CommandParameter="{Binding}" />
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
-                                            <DataGridTextColumn Header="NAME" Binding="{Binding Fullname}" />
-                                            <DataGridTextColumn Header="YEAR LEVEL" Binding="{Binding YearLevel}" />
-                                            <DataGridTextColumn Header="SECTION" Binding="{Binding Section}" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                    <UniformGrid Grid.Row="2" Rows="1">
-                                        <Button Content="ADD NEW" Style="{StaticResource MaterialDesignFlatButton}"
-                                                Command="{Binding AddStudentCommand}"
-                                                Height="Auto" Padding="10 20"/>
-                                        <Button Content="DELETE ALL" Style="{StaticResource MaterialDesignFlatButton}"
-                                                Command="{Binding DeleteAllStudentsCommand}"
-                                                Height="Auto" Padding="10 20" />
-                                        <Rectangle/>
-                                        <Button Content="VIEW LOG" Style="{StaticResource MaterialDesignFlatButton}"
-                                                Command="{Binding ToggleShowLogCommand}"
-                                                Height="Auto" Padding="10 20" />
-                                    </UniformGrid>
-                                </Grid>
-                            </md:Card>
-                        </md:Flipper.FrontContent>
-                        <md:Flipper.BackContent>
-                            <md:Card UniformCornerRadius="4"
+                          </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                      </DataGridTemplateColumn>
+                      <DataGridTextColumn Header="NAME" Binding="{Binding Fullname}" />
+                      <DataGridTextColumn Header="GRADE" Binding="{Binding Grade}" />
+                      <DataGridTextColumn Header="SECTION" Binding="{Binding Section}" />
+                    </DataGrid.Columns>
+                  </DataGrid>
+                    <StackPanel Grid.Row="2">
+                      <Grid Margin="20">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="*"/>
+                          <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox md:HintAssist.Hint="SEARCH KEYWORD" 
+                                 Text="{Binding SearchKeyword,UpdateSourceTrigger=PropertyChanged}"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                          <ComboBox SelectedIndex="{Binding FilterGrade}"
+                                    Margin="7 0">
+                            <ComboBoxItem Content="ALL GRADES"/>
+                            <ComboBoxItem Content="GRADE 7" />
+                            <ComboBoxItem Content="GRADE 8" />
+                            <ComboBoxItem Content="GRADE 9" />
+                            <ComboBoxItem Content="GRADE 10" />
+                            <ComboBoxItem Content="GRADE 11" />
+                            <ComboBoxItem Content="GRADE 12" />
+                          </ComboBox>
+                          <TextBox md:HintAssist.Hint="SECTION"
+                                   Text="{Binding FilterSection,UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                      </Grid>
+
+                      <UniformGrid Grid.Row="2" Rows="1">
+                        <Button Content="ADD NEW" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding AddStudentCommand}"
+                                Height="Auto" Padding="10 20" />
+                        <Button Content="DELETE ALL" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding DeleteAllStudentsCommand}"
+                                Height="Auto" Padding="10 20" />
+                        <Rectangle />
+                        <Button Content="VIEW LOG" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding ToggleShowLogCommand}"
+                                Height="Auto" Padding="10 20" />
+                      </UniformGrid>
+                    </StackPanel>
+                  
+                </Grid>
+              </md:Card>
+              </Border>
+            </md:TransitionerSlide>
+            <md:TransitionerSlide>
+              <md:TransitionerSlide.ForwardWipe>
+                <md:FadeWipe />
+              </md:TransitionerSlide.ForwardWipe>
+              <md:TransitionerSlide.BackwardWipe>
+                <md:FadeWipe />
+              </md:TransitionerSlide.BackwardWipe>
+              <Border Padding="7">
+              <md:Card UniformCornerRadius="4"
                                      Height="{Binding ElementName=Card,Path=ActualHeight}"
                      MinWidth="174"
-                     HorizontalAlignment="Left"
+                     HorizontalAlignment="Stretch"
                      Width="{Binding ElementName=Card, Path=ActualWidth}"
                      VerticalAlignment="Stretch">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto"/>
-                                        <RowDefinition Height="*" MinHeight="174"/>
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <md:ColorZone Mode="PrimaryDark">
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="*" />
-                                                <ColumnDefinition Width="Auto" />
-                                            </Grid.ColumnDefinitions>
-                                            <StackPanel Orientation="Horizontal" Margin="10">
-                                                <md:PackIcon Kind="CalendarClock" Height="32" Width="32"
+                <Grid>
+                  <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*" MinHeight="174"/>
+                    <RowDefinition Height="Auto" />
+                  </Grid.RowDefinitions>
+                  <md:ColorZone Mode="PrimaryDark">
+                    <Grid>
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                      </Grid.ColumnDefinitions>
+                      <StackPanel Orientation="Horizontal" Margin="10">
+                        <md:PackIcon Kind="CalendarClock" Height="32" Width="32"
                                                              VerticalAlignment="Center" />
-                                                <TextBlock Text=" ACTIVITY LOG"
+                        <TextBlock Text=" ACTIVITY LOG"
                                                            Style="{StaticResource MaterialDesignHeadlineTextBlock}"
                                                            VerticalAlignment="Center" />
-                                            </StackPanel>
-                                            <ToggleButton Grid.Column="1"
+                      </StackPanel>
+                      <ToggleButton Grid.Column="1"
                                                     Margin="10"
-                                                          IsChecked="{Binding ElementName=ToggleStudents,Path=IsChecked}"
+                                                          IsChecked="{Binding ShowStudents}"
                                                           Style="{StaticResource MaterialDesignActionDarkToggleButton}"
                                                           md:ToggleButtonAssist.OnContent="{md:PackIcon ChevronLeft}"
                                                     Content="{md:PackIcon ChevronRight}"/>
-                                        </Grid>
-                                    </md:ColorZone>
+                    </Grid>
+                  </md:ColorZone>
 
-                                    <DataGrid Grid.Row="1" IsReadOnly="True"
+                  <DataGrid Grid.Row="1" IsReadOnly="True"
                                               AutoGenerateColumns="False"
                                               ClipboardCopyMode="None"
                                               ItemsSource="{Binding Logs}"
@@ -177,43 +218,47 @@
                                               HeadersVisibility="Column"
                                               SelectionUnit="Cell"
                                               IsSynchronizedWithCurrentItem="True">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="TIME" Binding="{Binding Time,StringFormat=g}" />
-                                            <DataGridTextColumn Header="NAME" Binding="{Binding Student.Fullname}" />
-                                            <DataGridTemplateColumn Header="IN" SortMemberPath="In">
-                                                <DataGridTemplateColumn.CellTemplate>
-                                                    <DataTemplate>
-                                                        <Grid>
-                                                            <md:PackIcon Kind="Login"
+                    <DataGrid.Columns>
+                      <DataGridTextColumn Header="TIME" Binding="{Binding Time,StringFormat=g}" />
+                      <DataGridTextColumn Header="NAME" Binding="{Binding Student.Fullname}" />
+                      <DataGridTemplateColumn Header="IN" SortMemberPath="In">
+                        <DataGridTemplateColumn.CellTemplate>
+                          <DataTemplate>
+                            <Grid>
+                              <md:PackIcon Kind="Login"
                                                                          ToolTip="Entered the campus"
                                                                          Visibility="{Binding In,Converter={cnv:BooleanToVisibility}}"/>
-                                                            <md:PackIcon Kind="Logout"
+                              <md:PackIcon Kind="Logout"
                                                                          ToolTip="Left the campus"
                                                                          Visibility="{Binding In,Converter={cnv:BooleanToVisibility Collapsed,Visible}}" />
-                                                        </Grid>
-                                                    </DataTemplate>
-                                                </DataGridTemplateColumn.CellTemplate>
-                                            </DataGridTemplateColumn>
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                    <UniformGrid Grid.Row="2" Rows="1">
-                                        <Button Content="CLEAR" Style="{StaticResource MaterialDesignFlatButton}"
+                            </Grid>
+                          </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                      </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                  </DataGrid>
+                    <StackPanel Grid.Row="2">
+                      
+                  <UniformGrid Rows="1">
+                    <Button Content="CLEAR" Style="{StaticResource MaterialDesignFlatButton}"
                                 Command="{Binding AddStudentCommand}"
                                         Height="Auto" Padding="10 20"/>
-                                        <Button Content="PRINT" Style="{StaticResource MaterialDesignFlatButton}"
-                                Command="{Binding DeleteAllStudentsCommand}"
-                                        Height="Auto" Padding="10 20" />
-                                        <Rectangle />
-                                        <Button Content="STUDENTS" Style="{StaticResource MaterialDesignFlatButton}"
+                    <!--<Button Content="PRINT" Style="{StaticResource MaterialDesignFlatButton}"
+                                Command="{Binding PrintLogsCommand}"
+                                        Height="Auto" Padding="10 20" />-->
+                    <Rectangle />
+                    <Button Content="STUDENTS" Style="{StaticResource MaterialDesignFlatButton}"
                                                 Command="{Binding ToggleShowLogCommand}"
                                                 Height="Auto" Padding="10 20" />
-                                    </UniformGrid>
-                                </Grid>
-                            </md:Card>
-                        </md:Flipper.BackContent>
-                    </md:Flipper>
-                
-                    <md:Card UniformCornerRadius="4" Grid.Column="1"
+                  </UniformGrid>
+                    </StackPanel>
+                  </Grid>
+              </md:Card>
+              </Border>
+            </md:TransitionerSlide>
+          </md:Transitioner>
+
+          <md:Card UniformCornerRadius="4" Grid.Column="1"
                      MinWidth="174"
                      VerticalAlignment="Stretch"
                              Margin="20">
@@ -243,21 +288,47 @@
                             <Grid HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                 Visibility="{Binding GateMonitor.HasStudent,Converter={cnv:BooleanToVisibility}}">
+                              <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                              </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
+
+                <md:ColorZone Margin="0 0 10 0"
+                              Grid.RowSpan="2">
+                  <Viewbox>
+                  <Grid Margin="10" DataContext="{Binding GateMonitor.Student}">
+                    <Image Source="{Binding Picture,Converter={cnv:BytesToImage}}"
+                           Visibility="{Binding HasPicture,Converter={cnv:BooleanToVisibility}}"
+                           Margin="4"
+                           Width="256" />
+                    <Image Source="pack://application:,,,/male.jpg"
+                           Visibility="{Binding HasPicture,Converter={cnv:BooleanToVisibility Collapsed,Visible}}"
+                           Width="256"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           Stretch="Uniform" />
+                  </Grid>
+                  </Viewbox>
+                </md:ColorZone>
+
+                <md:ColorZone Margin="20" Mode="PrimaryDark" CornerRadius="7"
+                              Grid.Column="1">
                                 <TextBlock Text="{Binding GateMonitor.Message}"
                                            FontSize="74pt"
                                            Margin="20"
                                            TextAlignment="Center"/>
-                                <Viewbox Margin="74 20" Grid.Row="1">
+                </md:ColorZone>
+                <Viewbox Margin="74 20" Grid.Row="1"
+                         Grid.Column="1">
                                     <StackPanel>
                                         <TextBlock Text="{Binding GateMonitor.Student.Fullname,Mode=OneWay}"
                                            TextAlignment="Center"
                                            FontSize="74pt"/>
                                         <TextBlock FontSize="74pt" TextAlignment="Center">
-                                    <Run Text="{Binding GateMonitor.Student.YearLevel,Mode=OneWay}" />
+                                    <Run Text="Grade "/><Run Text="{Binding GateMonitor.Student.Grade,Mode=OneWay}" />
                                     <Run Text="-"/>
                                     <Run Text="{Binding GateMonitor.Student.Section,Mode=OneWay}"/>
                                         </TextBlock>

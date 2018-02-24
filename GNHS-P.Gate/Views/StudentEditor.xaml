@@ -5,6 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:GNHSP.Gate.Views"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:gate="clr-namespace:GNHSP.Gate"
+             xmlns:models="clr-namespace:System.Data.Models;assembly=System.GNHS-P.Gate.Data"
+             xmlns:converters="clr-namespace:GNHSP.Gate.Converters"
+             xmlns:viewModels="clr-namespace:GNHSP.Gate.ViewModels"
              mc:Ignorable="d" 
              Background="Transparent"
              Grid.IsSharedSizeScope="True"
@@ -18,26 +22,52 @@
                         <RowDefinition Height="*" MinHeight="174" SharedSizeGroup="a"/>
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
-                    <materialDesign:ColorZone Mode="Dark">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <StackPanel Orientation="Horizontal" Margin="10">
-                                <materialDesign:PackIcon Kind="Pencil" Height="32" Width="32"
+          <materialDesign:ColorZone Mode="Dark">
+            <Grid>
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+              </Grid.ColumnDefinitions>
+              <StackPanel Orientation="Horizontal" Margin="10">
+                <materialDesign:PackIcon Kind="Pencil" Height="32" Width="32"
                                                  VerticalAlignment="Center"/>
-                                <TextBlock Text="{Binding Title}"
+                <TextBlock Text="{Binding Title}"
                                            Style="{StaticResource MaterialDesignHeadlineTextBlock}"
                                            Margin="10 0 0 0"
                                                VerticalAlignment="Center"/>
-                            </StackPanel>
-                            <Button Margin="10" Grid.Column="1" Content="{materialDesign:PackIcon Close}"
+              </StackPanel>
+              <Button Margin="10" Grid.Column="1" Content="{materialDesign:PackIcon Close}"
                                     Command="{Binding CloseCommand}"
                                     Style="{StaticResource MaterialDesignToolButton}"/>
-                        </Grid>
-                    </materialDesign:ColorZone>
-                    <StackPanel Grid.Row="1" DataContext="{Binding Student}" Margin="10">
+            </Grid>
+          </materialDesign:ColorZone>
+          <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel>
+            
+            <materialDesign:ColorZone CornerRadius="7" Margin="0 0 10 0">
+              <Grid Margin="10">
+                <Image Source="{Binding Student.Picture,Converter={converters:BytesToImage}}"
+                     Margin="4"
+                     Width="256" />
+                <Image Source="pack://application:,,,/male.jpg"
+                       Visibility="{Binding Student.HasPicture,Converter={converters:BooleanToVisibility Collapsed,Visible}}"
+                     Width="256"
+                     RenderOptions.BitmapScalingMode="HighQuality"
+                     Stretch="Uniform"/>
+              </Grid>
+            </materialDesign:ColorZone>
+              
+              <Button Content="CHANGE PHOTO"
+                      Command="{Binding ChangePictureCommand}"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Bottom"
+                      Margin="4"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" DataContext="{Binding Student}" Margin="10">
                         <TextBox Text="{Binding Barcode,UpdateSourceTrigger=PropertyChanged,ValidatesOnDataErrors=True}"
                                  materialDesign:HintAssist.IsFloating="True"
                                  materialDesign:HintAssist.Hint="BARCODE"
@@ -50,16 +80,24 @@
                                          materialDesign:HintAssist.IsFloating="True"
                                          materialDesign:HintAssist.Hint="LAST NAME"
                                          Margin="10" />
-                        <TextBox Text="{Binding YearLevel,UpdateSourceTrigger=PropertyChanged}"
+                        <ComboBox ItemsSource="{Binding Source={gate:EnumBinding EnumType={x:Type models:YearLevels}}}"
+                                  SelectedItem="{Binding Grade}"
                                          materialDesign:HintAssist.IsFloating="True"
-                                         materialDesign:HintAssist.Hint="YEAR LEVEL"
+                                         materialDesign:HintAssist.Hint="GRADE"
                                          Margin="10" />
                         <TextBox Text="{Binding Section,UpdateSourceTrigger=PropertyChanged}"
                                          materialDesign:HintAssist.IsFloating="True"
                                          materialDesign:HintAssist.Hint="SECTION"
                                          Margin="10" />
+                      <TextBox Text="{Binding ContactNumber,UpdateSourceTrigger=PropertyChanged}"
+                               materialDesign:HintAssist.IsFloating="True"
+                               materialDesign:HintAssist.Hint="PARENT'S NUMBER"
+                               Margin="10" />
+            
                     </StackPanel>
-                    <UniformGrid Grid.Row="2" Rows="1">
+
+          </Grid>
+          <UniformGrid Grid.Row="2" Rows="1">
                         <Button Content="VIEW LOG" Style="{StaticResource MaterialDesignFlatButton}"
                                 Command="{Binding ToggleFlipCommand}"
                                         Height="Auto" Padding="10 20" />
@@ -99,10 +137,35 @@
                                     Style="{StaticResource MaterialDesignToolButton}" />
                         </Grid>
                     </materialDesign:ColorZone>
-                    <ListView Grid.Row="1">
-                        
-                    </ListView>
-                    <UniformGrid Grid.Row="2" Rows="1">
+          <DataGrid Grid.Row="1" IsReadOnly="True"
+                    MaxHeight="555"
+                    AutoGenerateColumns="False"
+                    ClipboardCopyMode="None"
+                    ItemsSource="{Binding Logs}"
+                    GridLinesVisibility="Horizontal"
+                    HeadersVisibility="Column"
+                    SelectionUnit="Cell"
+                    IsSynchronizedWithCurrentItem="True">
+            <DataGrid.Columns>
+              <DataGridTextColumn Header="TIME" Binding="{Binding Time,StringFormat=g}" />
+              <DataGridTextColumn Header="NAME" Binding="{Binding Student.Fullname}" />
+              <DataGridTemplateColumn Header="IN" SortMemberPath="In">
+                <DataGridTemplateColumn.CellTemplate>
+                  <DataTemplate>
+                    <Grid>
+                      <materialDesign:PackIcon Kind="Login"
+                                   ToolTip="Entered the campus"
+                                   Visibility="{Binding In,Converter={converters:BooleanToVisibility}}" />
+                      <materialDesign:PackIcon Kind="Logout"
+                                   ToolTip="Left the campus"
+                                   Visibility="{Binding In,Converter={converters:BooleanToVisibility Collapsed,Visible}}" />
+                    </Grid>
+                  </DataTemplate>
+                </DataGridTemplateColumn.CellTemplate>
+              </DataGridTemplateColumn>
+            </DataGrid.Columns>
+          </DataGrid>
+          <UniformGrid Grid.Row="2" Rows="1">
                         <Button Content="STUDENT INFO" Style="{StaticResource MaterialDesignFlatButton}"
                                 Command="{Binding ToggleFlipCommand}"
                                         Height="Auto" Padding="10 20" />

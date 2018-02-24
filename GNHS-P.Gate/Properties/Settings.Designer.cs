@@ -70,5 +70,65 @@ namespace GNHSP.Gate.Properties {
                 this["ScannerName"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ExitMessage {
+            get {
+                return ((string)(this["ExitMessage"]));
+            }
+            set {
+                this["ExitMessage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string EntranceMessage {
+            get {
+                return ((string)(this["EntranceMessage"]));
+            }
+            set {
+                this["EntranceMessage"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool NotifyAbsent {
+            get {
+                return ((bool)(this["NotifyAbsent"]));
+            }
+            set {
+                this["NotifyAbsent"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AbsentTime {
+            get {
+                return ((string)(this["AbsentTime"]));
+            }
+            set {
+                this["AbsentTime"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AbsentMessage {
+            get {
+                return ((string)(this["AbsentMessage"]));
+            }
+            set {
+                this["AbsentMessage"] = value;
+            }
+        }
     }
 }

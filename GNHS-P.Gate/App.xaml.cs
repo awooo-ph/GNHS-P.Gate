@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
+using System.Data.Properties;
 using System.Linq;
 using System.Threading;
 using System.Windows;
+using GNHSP.Gate.Properties;
+using GNHSP.Gate.ViewModels;
 
 namespace GNHSP.Gate
 {
@@ -22,8 +25,11 @@ namespace GNHSP.Gate
 
         protected override void OnExit(ExitEventArgs e)
         {
-            base.OnExit(e);
+            Settings.Default.Save();
+            SmsSettings.Default.Save();
             Keyboard.UnHook();
+            SMS.Stop();
+            base.OnExit(e);
         }
     }
 }
