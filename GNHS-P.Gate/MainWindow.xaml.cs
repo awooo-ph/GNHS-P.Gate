@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using GNHSP.Gate.Properties;
 
 namespace GNHSP.Gate
 {
@@ -11,12 +12,29 @@ namespace GNHSP.Gate
         public MainWindow()
         {
             InitializeComponent();
+            Settings.Default.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName != nameof(Settings.Default.FullScreen)) return;
+                if (Settings.Default.FullScreen)
+                {
+                    WindowState = WindowState.Maximized;
+                    WindowStyle = WindowStyle.None;
+                }
+                else
+                {
+                    WindowStyle = WindowStyle.SingleBorderWindow;
+                }
+            };
         }
         
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
-           
+            if (Settings.Default.FullScreen)
+            {
+                WindowState = WindowState.Maximized;
+                WindowStyle = WindowStyle.None;
+            }
         }
 
         //private Magic _logGenie;

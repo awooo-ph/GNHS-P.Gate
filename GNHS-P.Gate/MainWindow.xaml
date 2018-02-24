@@ -31,20 +31,39 @@
                <views:Settings/>
             </md:DrawerHost.RightDrawerContent>
         <Grid>
-                <ListBox VerticalAlignment="Top" Style="{StaticResource MaterialDesignToolToggleFlatListBox}"
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Top" HorizontalAlignment="Right">
+        <ListBox VerticalAlignment="Top" Style="{StaticResource MaterialDesignToolToggleFlatListBox}"
+                 HorizontalAlignment="Right">
+          <ListBoxItem Content="{md:PackIcon Kind=Fullscreen}"
+                       ToolTip="Full Screen"
+                       DataContext="{Binding Source={x:Static properties:Settings.Default}}"
+                       IsSelected="{Binding FullScreen}"
+                       Visibility="{Binding FullScreen,Converter={cnv:BooleanToVisibility Collapsed,Visible}}" />
+          <ListBoxItem Content="{md:PackIcon Kind=FullscreenExit}"
+                       ToolTip="Exit Full Screen"
+                       DataContext="{Binding Source={x:Static properties:Settings.Default}}"
+                       IsSelected="{Binding FullScreen}"
+                       Visibility="{Binding FullScreen,Converter={cnv:BooleanToVisibility}}" />
+        </ListBox>
+          <ListBox VerticalAlignment="Top" Style="{StaticResource MaterialDesignToolToggleFlatListBox}"
                          HorizontalAlignment="Right" >
-                    <ListBoxItem Content="{md:PackIcon Kind=Settings}"
+            <ListBoxItem Content="{md:PackIcon Kind=Settings}"
                                  IsSelected="{Binding IsSettingsVisible}"
                                   x:Name="ToggleButton" />
                 </ListBox>
-            
-            <ToggleButton Style="{StaticResource MaterialDesignActionDarkToggleButton}"
-                          IsChecked="{Binding ShowStudents}"
-                          VerticalAlignment="Top"
-                          HorizontalAlignment="Left"
-                          md:ToggleButtonAssist.OnContent="{md:PackIcon School}"
-                          Visibility="{Binding ShowStudents,Mode=OneWay,Converter={cnv:BooleanToVisibility Collapsed,Visible}}"
-                          Content="{md:PackIcon School}" />
+        </StackPanel>
+
+        <ListBox VerticalAlignment="Top" Style="{StaticResource MaterialDesignToolToggleFlatListBox}"
+                 HorizontalAlignment="Left">
+          <ListBoxItem IsSelected="{Binding ShowStudents}"
+                        >
+            <StackPanel Orientation="Horizontal">
+              <md:PackIcon Kind="School"/>
+              <TextBlock Text="  STUDENTS " VerticalAlignment="Center"/>
+            </StackPanel>
+          </ListBoxItem>
+        </ListBox>
+          
                 <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>

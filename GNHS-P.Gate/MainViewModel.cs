@@ -69,7 +69,7 @@ namespace GNHSP.Gate
                     CheckAttendance(DateTime.Now.AddDays(-1).Date);
             }
         }
-
+        
         private async void AbsentReminder()
         {
             var cutoff = DateTime.Now;
