@@ -60,7 +60,7 @@ namespace GNHSP.Gate
                 return;
             }
 
-            if (GetScannerId(e.Device) == Settings.Default.ScannerId)
+            if (e.Device.Name == Settings.Default.ScannerName)
             {
                 if (e.KeyPressState != KeyPressState.Down) return;
                 if (e.Key != Key.Enter)
@@ -73,6 +73,7 @@ namespace GNHSP.Gate
                 else
                 {
                     if (_input.Length == 0) return;
+                    _input.Remove(0, 1);
                     //e.Handled = true;
                     Messenger.Default.Broadcast(Messages.Scan, _input.ToString());
                     _input.Clear();
