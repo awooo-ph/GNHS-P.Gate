@@ -75,6 +75,27 @@ namespace GNHSP.Gate.ViewModels
             }
         }
         
+
+        private ICommand _changePictureCommand;
+
+        public ICommand ChangePictureCommand => _changePictureCommand ?? (_changePictureCommand = new DelegateCommand(
+            d =>
+            {
+                var dialog = new OpenFileDialog
+                {
+                    Multiselect = false,
+                    Filter = @"All Images|*.BMP;*.JPG;*.JPEG;*.GIF;*.PNG|
+                            BMP Files|*.BMP;*.DIB;*.RLE|
+                            JPEG Files|*.JPG;*.JPEG;*.JPE;*.JFIF|
+                            GIF Files|*.GIF|
+                            PNG Files|*.PNG",
+                    Title = "Select Picture",
+                };
+                if (!(dialog.ShowDialog() ?? false))
+                    return;
+
+                Student.Picture = File.ReadAllBytes(dialog.FileName);
+            }));
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
