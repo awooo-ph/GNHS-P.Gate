@@ -16,7 +16,7 @@ namespace GNHSP.Gate
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);
-            MainViewModel.Instance.ShowLogin(DialogHost);
+           
         }
 
         //private Magic _logGenie;

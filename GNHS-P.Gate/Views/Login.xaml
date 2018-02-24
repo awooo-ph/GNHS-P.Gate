@@ -43,7 +43,7 @@
                     <Button Style="{StaticResource MaterialDesignFlatButton}" Padding="10" Height="Auto"
                         IsCancel="True"
                         Command="{Binding Source={x:Static materialDesign:DialogHost.CloseDialogCommand}}"
-                        Content="E_XIT">
+                        Content="CANCEL">
                         <Button.CommandParameter>
                             <system:Boolean>False</system:Boolean>
                         </Button.CommandParameter>

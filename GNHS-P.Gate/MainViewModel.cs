@@ -57,6 +57,22 @@ namespace GNHSP.Gate
                     return;
                 _ShowLog = value;
                 OnPropertyChanged(nameof(ShowLog));
+        private bool _ShowStudents;
+
+        public bool ShowStudents
+        {
+            get => _ShowStudents;
+            set
+            {
+                if(value == _ShowStudents)
+                    return;
+                if (value && CurrentUser == null)
+                {
+                    MainViewModel.Instance.ShowLogin(((MainWindow) Application.Current.MainWindow).DialogHost);
+                    return;
+                }
+                _ShowStudents = value;
+                OnPropertyChanged(nameof(ShowStudents));
             }
         }
 
@@ -113,17 +129,17 @@ namespace GNHSP.Gate
             var login = new Views.Login();
             RootDialog.DialogContent = login;
             RootDialog.IsOpen = true;
-
+            var cancelled = true;
             RootDialog.DialogClosing += (sender, args) =>
             {
-                if (!((bool) args.Parameter))
-                    App.Current.Shutdown(0);
+                if (!((bool) args.Parameter)) return;
                 var usr = User.Cache.FirstOrDefault(x => x.Username.ToLower() == login.Username.Text.ToLower());
                 if (usr == null && User.Cache.Count == 0)
                 {
                     usr = new User()
                     {
                         Username = login.Username.Text,
+                        IsAdmin = true,
                     };
                     usr.Save();
                 }
@@ -137,6 +153,7 @@ namespace GNHSP.Gate
                 {
                     CurrentUser = null;
                 }
+                cancelled = false;
             };
                 
             while (RootDialog.IsOpen)
@@ -145,7 +162,7 @@ namespace GNHSP.Gate
             }
             
             _loginShown = false;
-            if (CurrentUser != null) return;
+            if (CurrentUser != null || cancelled) return;
             
             var alert = new AlertDialog("Authentication Failed","The username and password you entered is invalid.");
             RootDialog.DialogContent = alert;
@@ -334,6 +351,13 @@ namespace GNHSP.Gate
             {
                 if(value == _IsSettingsVisible)
                     return;
+
+                if (value && CurrentUser == null)
+                {
+                    MainViewModel.Instance.ShowLogin(((MainWindow)Application.Current.MainWindow).DialogHost);
+                    return;
+                }
+                
                 _IsSettingsVisible = value;
                 OnPropertyChanged(nameof(IsSettingsVisible));
             }
