@@ -1,7 +1,11 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
+using System.Data.Models;
+using System.IO;
 using System.Runtime.CompilerServices;
+using System.Windows.Data;
 using System.Windows.Input;
-using GNHSP.Gate.Models;
+using Microsoft.Win32;
 
 namespace GNHSP.Gate.ViewModels
 {
@@ -72,9 +76,9 @@ namespace GNHSP.Gate.ViewModels
                 _Student = value;
                 OnPropertyChanged(nameof(Student));
                 OnPropertyChanged(nameof(Title));
+                Logs.Refresh();
             }
         }
-        
 
         private ICommand _changePictureCommand;
 
@@ -96,6 +100,28 @@ namespace GNHSP.Gate.ViewModels
 
                 Student.Picture = File.ReadAllBytes(dialog.FileName);
             }));
+
+        private ListCollectionView _logs;
+
+        public ListCollectionView Logs
+        {
+            get
+            {
+                if (_logs != null)
+                    return _logs;
+                _logs = new ListCollectionView(GatePass.Cache);
+                _logs.CustomSort = new LogComparer();
+                _logs.Filter = FilterLog;
+                return _logs;
+            }
+        }
+
+        private bool FilterLog(object o)
+        {
+            if (!(o is GatePass log)) return false;
+            return log.StudentId == Student?.Id;
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)

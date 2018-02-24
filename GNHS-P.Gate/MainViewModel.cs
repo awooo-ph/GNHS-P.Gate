@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Data.Models;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
-using GNHSP.Gate.Models;
 using GNHSP.Gate.ViewModels;
 using GNHSP.Gate.Views;
 using MaterialDesignThemes.Wpf;
+using Settings = GNHSP.Gate.Properties.Settings;
 
 namespace GNHSP.Gate
 {
@@ -33,6 +34,21 @@ namespace GNHSP.Gate
                }
                pass.Save();
                GateMonitor.Pass = pass;
+
+               var message = "";
+               if (pass.In)
+               {
+                   message = Settings.Default.EntranceMessage;
+               }
+               else
+               {
+                   message = Settings.Default.ExitMessage;
+               }
+
+               message = message.Replace("[NAME]", stud.Fullname)
+                   .Replace("[TIME]", pass.Time.ToString("MMM d h:mm tt"));
+               if(!string.IsNullOrWhiteSpace(stud.ContactNumber))
+                SMS.Send(message,stud.ContactNumber,true);
            });
             
             Messenger.Default.AddListener<User>(Messages.ModelDeleted,
@@ -44,6 +60,49 @@ namespace GNHSP.Gate
                     }, usr);
                     CurrentUser = null;
                 });
+
+            if (Settings.Default.NotifyAbsent)
+            {
+                if (!string.IsNullOrWhiteSpace(Settings.Default.AbsentTime))
+                    Task.Factory.StartNew(AbsentReminder);
+                else
+                    CheckAttendance(DateTime.Now.AddDays(-1).Date);
+            }
+        }
+
+        private async void AbsentReminder()
+        {
+            var cutoff = DateTime.Now;
+            if (!DateTime.TryParse(Settings.Default.AbsentTime, out cutoff)) return;
+            while (DateTime.Now < cutoff)
+                await TaskEx.Delay(1111);
+            CheckAttendance(DateTime.Now.Date);
+        }
+
+        private bool _checkingAttendance;
+        private void CheckAttendance(DateTime date)
+        {
+            if (date.DayOfWeek == DayOfWeek.Saturday || date.DayOfWeek == DayOfWeek.Sunday) return;
+            if (string.IsNullOrWhiteSpace(Settings.Default.AbsentMessage)) return;
+            if (_checkingAttendance) return;
+            _checkingAttendance = true;
+            Task.Factory.StartNew(async () =>
+            {
+                var students = Student.Cache.ToList();
+                foreach (var student in students)
+                {
+                    if(string.IsNullOrWhiteSpace(student.ContactNumber)) continue;
+                    if(student.DateRegistered.Date==date.Date || student.LastAbsentNotification.Date==date.Date) continue;
+                    var previousPass = GatePass.GetPreviousPass(student.Id);
+                    if (date == previousPass?.Time.Date) continue;
+                    var message = Settings.Default.AbsentMessage
+                        .Replace("[NAME]", student.Fullname)
+                        .Replace("[TIME]", date.ToString("MMM d, yyyy"));
+                    SMS.Send(message, student.ContactNumber);
+                    student.Update(nameof(Student.LastAbsentNotification),date.Date);
+                    await TaskEx.Delay(1111);
+                }
+            });
         }
 
         private bool _ShowLog;
@@ -57,6 +116,27 @@ namespace GNHSP.Gate
                     return;
                 _ShowLog = value;
                 OnPropertyChanged(nameof(ShowLog));
+                if (value)
+                    InfoIndex = 1;
+                else
+                    InfoIndex = 0;
+            }
+        }
+
+        private int _InfoIndex;
+
+        public int InfoIndex
+        {
+            get => _InfoIndex;
+            set
+            {
+                if(value == _InfoIndex)
+                    return;
+                _InfoIndex = value;
+                OnPropertyChanged(nameof(InfoIndex));
+            }
+        }
+
         private bool _ShowStudents;
 
         public bool ShowStudents
@@ -75,6 +155,8 @@ namespace GNHSP.Gate
                 OnPropertyChanged(nameof(ShowStudents));
             }
         }
+
+        
 
         private ICommand _ToggleShowLogCommand;
 
@@ -184,8 +266,28 @@ namespace GNHSP.Gate
             {
                 if (_students != null) return _students;
                 _students = (ListCollectionView) CollectionViewSource.GetDefaultView(Student.Cache);
+                _students.Filter = FilterStudent;
                 return _students;
             }
+        }
+
+        private bool FilterStudent(object o)
+        {
+            if (!(o is Student stud)) return false;
+
+            if (FilterGrade > 0)
+            {
+                var grade = (int) stud.Grade;
+                if (FilterGrade +6 != grade)
+                    return false;
+            }
+            if (!string.IsNullOrWhiteSpace(FilterSection))
+            {
+                if (stud.Section.ToLower() != FilterSection.ToLower())
+                    return false;
+            }
+            if (string.IsNullOrWhiteSpace(SearchKeyword)) return true;
+            return stud.Fullname.ToLower().Contains(SearchKeyword.ToLower());
         }
 
         private ICommand _editStudentCommand;
@@ -219,7 +321,10 @@ namespace GNHSP.Gate
             StudentEditor.Student = new Student();
             StudentEditor.IsFlipped = false;
             StudentEditor.IsOpen = true;
-        },d=>CurrentUser?.IsAdmin??false));
+        },d=>
+        {
+            return CurrentUser?.IsAdmin ?? false;
+        }));
 
         private ICommand _deleteAllStudentsCommand;
 
@@ -279,15 +384,7 @@ namespace GNHSP.Gate
             }
         }
 
-        class LogComparer : IComparer
-        {
-            public int Compare(object x, object y)
-            {
-                var log1 = x as GatePass;
-                var log2 = y as GatePass;
-                return log2.Time.CompareTo(log1.Time);
-            }
-        }
+        
 
         private ICommand _newUserCommand;
 
@@ -379,7 +476,64 @@ namespace GNHSP.Gate
         {
             CurrentUser = null;
             IsSettingsVisible = false;
-            ShowLogin(null);
+            ShowStudents = false;
         }));
+
+        private string _SearchKeyword;
+
+        public string SearchKeyword
+        {
+            get => _SearchKeyword;
+            set
+            {
+                if(value == _SearchKeyword)
+                    return;
+                _SearchKeyword = value;
+                OnPropertyChanged(nameof(SearchKeyword));
+                Students.Refresh();
+            }
+        }
+
+        private int _FilterGrade;
+
+        public int FilterGrade
+        {
+            get => _FilterGrade;
+            set
+            {
+                if(value == _FilterGrade)
+                    return;
+                _FilterGrade = value;
+                OnPropertyChanged(nameof(FilterGrade));
+                Students.Refresh();
+            }
+        }
+
+        private string _FilterSection;
+
+        public string FilterSection
+        {
+            get => _FilterSection;
+            set
+            {
+                if(value == _FilterSection)
+                    return;
+                _FilterSection = value;
+                OnPropertyChanged(nameof(FilterSection));
+                Students.Refresh();
+            }
+        }
+
+        
+    }
+
+    class LogComparer : IComparer
+    {
+        public int Compare(object x, object y)
+        {
+            var log1 = x as GatePass;
+            var log2 = y as GatePass;
+            return log2.Time.CompareTo(log1.Time);
+        }
     }
 }
