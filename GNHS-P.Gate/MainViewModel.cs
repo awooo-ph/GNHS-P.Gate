@@ -10,6 +10,7 @@ using System.Windows.Input;
 using GNHSP.Gate.ViewModels;
 using GNHSP.Gate.Views;
 using MaterialDesignThemes.Wpf;
+using Microsoft.Win32;
 using Settings = GNHSP.Gate.Properties.Settings;
 
 namespace GNHSP.Gate
@@ -321,6 +322,7 @@ namespace GNHSP.Gate
             StudentEditor.Student = new Student();
             StudentEditor.IsFlipped = false;
             StudentEditor.IsOpen = true;
+           
         },d=>
         {
             return CurrentUser?.IsAdmin ?? false;
@@ -524,8 +526,39 @@ namespace GNHSP.Gate
             }
         }
 
-        
+        private ICommand _changeWelcomePictureCommand;
+
+        public ICommand ChangePictureCommand =>
+            _changeWelcomePictureCommand ?? (_changeWelcomePictureCommand = new DelegateCommand(
+                d =>
+                {
+                    var dialog = new OpenFileDialog
+                    {
+                        Multiselect = false,
+                        Filter = @"All Images|*.BMP;*.JPG;*.JPEG;*.GIF;*.PNG|
+                            BMP Files|*.BMP;*.DIB;*.RLE|
+                            JPEG Files|*.JPG;*.JPEG;*.JPE;*.JFIF|
+                            GIF Files|*.GIF|
+                            PNG Files|*.PNG",
+                        Title = "Select Picture",
+                    };
+                    if (!(dialog.ShowDialog() ?? false))
+                        return;
+
+                    Settings.Default.WelcomeScreen = dialog.FileName;
+                }));
+
+        private ICommand _removePictureCommand;
+
+        public ICommand RemovePictureCommand => _removePictureCommand ?? (_removePictureCommand = new DelegateCommand(
+                d =>
+                {
+                    Settings.Default.WelcomeScreen = "";
+                }));
+
     }
+
+
 
     class LogComparer : IComparer
     {

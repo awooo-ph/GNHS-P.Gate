@@ -21,6 +21,7 @@ namespace GNHSP.Gate
             base.OnStartup(e);
             awooo.IsRunning = true;
             awooo.Context = SynchronizationContext.Current;
+            SMS.Start();
         }
 
         protected override void OnExit(ExitEventArgs e)

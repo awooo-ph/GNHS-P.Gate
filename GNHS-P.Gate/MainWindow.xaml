@@ -304,7 +304,12 @@
                                              Visibility="{Binding GateMonitor.HasStudent,Converter={cnv:BooleanToVisibility Collapsed,Visible}}"
                                              x:Name="Barcode"/>
 
-                            <Grid HorizontalAlignment="Center"
+              <Image Source="{Binding Source={x:Static properties:Settings.Default},Path=WelcomeScreen,Converter={cnv:PathToBitmapConverter}}"
+                     RenderOptions.BitmapScalingMode="HighQuality"
+                     Visibility="{Binding GateMonitor.HasStudent,Converter={cnv:BooleanToVisibility Collapsed,Visible}}"
+                     Stretch="UniformToFill" />
+
+              <Grid HorizontalAlignment="Center"
                                         VerticalAlignment="Center"
                                 Visibility="{Binding GateMonitor.HasStudent,Converter={cnv:BooleanToVisibility}}">
                               <Grid.ColumnDefinitions>

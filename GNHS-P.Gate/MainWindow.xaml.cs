@@ -25,8 +25,24 @@ namespace GNHSP.Gate
                     WindowStyle = WindowStyle.SingleBorderWindow;
                 }
             };
+            
+            Messenger.Default.AddListener<string>(Messages.Scan, d =>
+            {
+                Title = d;
+            });
         }
-        
+
+        protected override void OnInitialized(EventArgs e)
+        {
+            base.OnInitialized(e);
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            Keyboard.Hook(this);
+        }
+
         protected override void OnActivated(EventArgs e)
         {
             base.OnActivated(e);

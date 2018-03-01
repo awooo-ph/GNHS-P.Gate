@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data.Models;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using GNHSP.Gate.Properties;
+using Microsoft.Win32;
 
 namespace GNHSP.Gate.ViewModels
 {
@@ -83,5 +87,6 @@ namespace GNHSP.Gate.ViewModels
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
     }
 }

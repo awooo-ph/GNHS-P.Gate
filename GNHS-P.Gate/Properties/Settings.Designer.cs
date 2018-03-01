@@ -142,5 +142,17 @@ namespace GNHSP.Gate.Properties {
                 this["FullScreen"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string WelcomeScreen {
+            get {
+                return ((string)(this["WelcomeScreen"]));
+            }
+            set {
+                this["WelcomeScreen"] = value;
+            }
+        }
     }
 }

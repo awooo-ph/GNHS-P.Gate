@@ -11,6 +11,7 @@
              xmlns:global="clr-namespace:;assembly=System.GNHS-P.Gate.Data"
              xmlns:properties1="clr-namespace:System.Data.Properties;assembly=System.GNHS-P.Gate.Data"
              xmlns:viewModels="clr-namespace:GNHSP.Gate.ViewModels;assembly=System.GNHS-P.Gate.Data"
+             xmlns:viewModels1="clr-namespace:GNHSP.Gate.ViewModels"
              MaxWidth="555"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
@@ -105,6 +106,7 @@
             <ColumnDefinition Width="Auto"/>
           </Grid.ColumnDefinitions>
           <ComboBox ItemsSource="{Binding Source={x:Static viewModels:SMS.Instance},Path=Ports}"
+                    IsSynchronizedWithCurrentItem="True"
                     SelectedValue="{Binding Source={x:Static properties1:SmsSettings.Default},Path=Port}"
                     SelectedValuePath="Port" />
           <Button Content="REFRESH"
@@ -112,6 +114,12 @@
                   Margin="10 0 0 0"
                   Command="{Binding Source={x:Static viewModels:SMS.Instance},Path=RefreshPortsCommand}"/>
         </Grid>
+              
+              <TextBox Text="{Binding Source={x:Static properties1:SmsSettings.Default},Path=GatewayUrl}"
+                       md:HintAssist.Hint="SMS Gateway"
+                       Margin="0 10"
+                       md:HintAssist.IsFloating="True"/>
+              
               <TextBox Text="{Binding Source={x:Static properties:Settings.Default},Path=EntranceMessage}"
                        md:HintAssist.Hint="ENTRANCE MESSAGE TEMPLATE"
                        Margin="0 10"
@@ -171,6 +179,23 @@
                      ToolTip="Uses the same variables as above."
                      Margin="0 10"/>
           </StackPanel>
+        </GroupBox>
+
+        <GroupBox Margin="0 10" Header="WELCOME SCREEN">
+          <Grid>
+            <Image Source="{Binding Source={x:Static properties:Settings.Default},Path=WelcomeScreen,Converter={converters:PathToBitmapConverter}}"
+                   Stretch="Uniform"/>
+            <UniformGrid Rows="1"
+                         Margin="20"
+                         VerticalAlignment="Center" />
+            <Button Content="CHANGE PICTURE" HorizontalAlignment="Center"
+                    Command="{Binding ChangePictureCommand}"
+                    Margin="0 0 10 0"
+                    />
+            <Button Content="REMOVE PICTURE" HorizontalAlignment="Center"
+                    Command="{Binding RemovePictureCommand}"
+                    Margin="10 0 0 0" />
+          </Grid>
         </GroupBox>
 
         <local:Users Margin="0 47" Visibility="{Binding CurrentUser.IsAdmin,Converter={converters:BooleanToVisibility}}"/>

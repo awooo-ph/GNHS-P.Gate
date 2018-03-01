@@ -5,6 +5,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Data;
 using System.Windows.Input;
+using GNHSP.Gate.Views;
 using Microsoft.Win32;
 
 namespace GNHSP.Gate.ViewModels
@@ -38,6 +39,10 @@ namespace GNHSP.Gate.ViewModels
                     return;
                 _IsOpen = value;
                 OnPropertyChanged(nameof(IsOpen));
+                if (value)
+                    Keyboard.ExclusiveScan = Scan;
+                else
+                    Keyboard.ExclusiveScan = null;
             }
         }
 
@@ -127,6 +132,12 @@ namespace GNHSP.Gate.ViewModels
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public void Scan(string obj)
+        {
+            if (Student == null) return;
+            Student.Barcode = obj;
         }
     }
 }

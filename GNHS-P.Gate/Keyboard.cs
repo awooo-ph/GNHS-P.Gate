@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using GNHSP.Gate.Properties;
@@ -39,6 +40,8 @@ namespace GNHSP.Gate
             _watchKeys.Add(key, callback);
         }
 
+        public static Action<string> ExclusiveScan { get; set; }
+
         private static void RawInputOnKeyPressed(object sender, RawInputEventArgs e)
         {
             if (e.KeyPressState == KeyPressState.Up && _watchKeys.ContainsKey(e.Key))
@@ -60,8 +63,8 @@ namespace GNHSP.Gate
                 return;
             }
 
-            if (e.Device.Name == Settings.Default.ScannerName)
-            {
+            //if (e.Device.Name == Settings.Default.ScannerName)
+            //{
                 if (e.KeyPressState != KeyPressState.Down) return;
                 if (e.Key != Key.Enter)
                 {
@@ -74,12 +77,18 @@ namespace GNHSP.Gate
                 {
                     if (_input.Length == 0) return;
                     _input.Remove(0, 1);
+                    //if (ExclusiveScan != null)
+                    //{
+                    //    ExclusiveScan.Invoke(_input.ToString());
+                    //    _input.Clear();
+                    //    return;
+                    //}
                     //e.Handled = true;
                     Messenger.Default.Broadcast(Messages.Scan, _input.ToString());
                     _input.Clear();
                 }
                 //  TrapKey = true;
-            }
+            //}
 
         }
 
